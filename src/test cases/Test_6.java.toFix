@@ -1,0 +1,14 @@
+//weldAt not safe
+//weldBetween safe
+
+public class Test_6 {
+	public static void m5(int a, int n) {
+		Robot y = new Robot(0, 2);
+		if (n >= 0) {
+			a = -n;
+		} else {
+			a = n;
+		}
+		y.weldAt(a);
+	}
+}
