@@ -3,7 +3,7 @@ public class Test_2 {
 		Car car = new Car();
 		if (2*a < 9 && a > 0) {
 			car.setSpeed(a);
-			if (a > 5) {
+			if (a < 5) {
 				car.setSpeed(a + 4);
 			}
 		}

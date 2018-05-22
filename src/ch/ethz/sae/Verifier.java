@@ -5,6 +5,7 @@ import gmp.Mpq;
 import java.util.HashMap;
 
 import apron.ApronException;
+import apron.Abstract1;
 import apron.Interval;
 import apron.Scalar;
 import soot.jimple.IntConstant;
@@ -19,6 +20,19 @@ import soot.SootMethod;
 import soot.Unit;
 import soot.Value;
 import soot.toolkits.graph.BriefUnitGraph;
+import soot.jimple.internal.JInvokeStmt;
+import soot.jimple.internal.JVirtualInvokeExpr;
+import soot.jimple.IntConstant;
+import soot.jimple.InvokeExpr;
+import soot.jimple.internal.JInvokeStmt;
+import soot.jimple.internal.JSpecialInvokeExpr;
+import soot.jimple.internal.JVirtualInvokeExpr;
+import soot.jimple.internal.JimpleLocal;
+import soot.jimple.spark.pag.AllocNode;
+import soot.jimple.spark.pag.Node;
+import soot.jimple.spark.pag.PAG;
+import soot.jimple.spark.sets.P2SetVisitor;
+import soot.jimple.spark.sets.PointsToSetInternal;
 
 public class Verifier {
 	
@@ -49,44 +63,38 @@ public class Verifier {
 					method.retrieveActiveBody()), sootClass);
 			analysis.run();
 			
-			for(Unit u : method.getActiveBody().getUnits()){
+			
+			int abstractNum = 0;
+			for(JInvokeStmt call : analysis.setSpeedCalls){
 				
-				if(u instanceof JInvokeStmt){
-					Stmt stmt = (Stmt) u;
-					InvokeExpr expr = stmt.getInvokeExpr();
-					if(expr.getMethod().getName().equals(functionName)){
-						speedcounter++;
-						
-						AWrapper before = analysis.getFlowBefore(u);
-						Value  v = expr.getArgs().get(0); 
-						
-						//MAYBE CHECK IF INT CONSTANT (v)
-						Interval i = null;
-						
-        				if (v instanceof IntConstant) {
-        					i = new Interval(new Mpq(v.toString()),new Mpq(v.toString()));
-        				}else{
-        					
-        					try {
-								i = before.get().getBound(Analysis.man, v.toString());
-							} catch (ApronException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-        				}        				
-												
-						if(i.isBottom()|| speedcounter == 0){
-							result = noSpeedSet;
-						}else if (i.sup().isInfty() == 1){
-							result = ""+Integer.MAX_VALUE;
-						}
-						else{
-							result = i.sup().toString();
-						}
+				speedcounter++;
+				
+				Abstract1 before = analysis.setSpeedAbstract.get(abstractNum);
+				abstractNum++;
+				
+				JVirtualInvokeExpr virExpr = (JVirtualInvokeExpr) call.getInvokeExprBox().getValue();
+				Value v = virExpr.getArg(0);
+				
+				Interval i = null;				
 							
+					try {
+						i = before.getBound(analysis.man, v.toString());
+					} catch (ApronException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
+  				
+										
+				if(i.isBottom()|| speedcounter == 0){
+					result = noSpeedSet;
+				}else if (i.sup().isInfty() == 1){
+					result = ""+Integer.MAX_VALUE;
+				}
+				else{
+					result = i.sup().toString();
 				}
 			}
+	
 			
 			System.out.println(result);
 		}

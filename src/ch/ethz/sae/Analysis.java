@@ -2,11 +2,18 @@ package ch.ethz.sae;
 
 import gmp.Mpq;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import soot.jimple.InvokeExpr;
+import soot.jimple.internal.JSpecialInvokeExpr;
+import soot.jimple.internal.JInvokeStmt;
+import soot.jimple.internal.JReturnStmt;
+import soot.jimple.internal.JInvokeStmt;
+import soot.jimple.internal.JVirtualInvokeExpr;
 import apron.Abstract1;
 import apron.ApronException;
 import apron.Environment;
@@ -54,6 +61,10 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 	/* Apron environment */
 	public static Environment env;
 
+	//list of calls
+	public ArrayList<JInvokeStmt> setSpeedCalls = new ArrayList<JInvokeStmt>();
+	public ArrayList<Abstract1> setSpeedAbstract = new ArrayList<Abstract1>();
+	
 	//list type
 	private static List<String> intTypes = Arrays.asList("int","short","byte");
 	
@@ -258,7 +269,34 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 					assignmentIterFallout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_fallout));
 					assignmentIterBranchout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_branchout));	
 				}
-			} else {
+			}else if(s instanceof JReturnStmt){
+				
+				//pass
+				o_fallout = new Abstract1(man, inWrapper.get());
+				o_branchout = new Abstract1(man, inWrapper.get());
+				
+				assignmentIterFallout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_fallout));
+				assignmentIterBranchout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_branchout));	
+				
+			} else if (s instanceof JInvokeStmt){
+				o_fallout = new Abstract1(man, inWrapper.get());
+				o_branchout = new Abstract1(man, inWrapper.get());
+				
+				assignmentIterFallout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_fallout));
+				assignmentIterBranchout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_branchout));	
+				
+				JInvokeStmt stmt = (JInvokeStmt)s;
+				InvokeExpr expr = ((JInvokeStmt) s).getInvokeExpr();
+				String functName = expr.getMethod().getName();
+				String className = expr.getMethod().getDeclaringClass().getName();
+				
+				
+				if(className.equals("Car") && functName.equals("setSpeed")){
+					setSpeedCalls.add(stmt);
+					setSpeedAbstract.add(inWrapper.get());
+				}
+			}
+			else {
 				invalidFlag = true;	
 			}
 			
