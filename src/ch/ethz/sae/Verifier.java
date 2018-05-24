@@ -16,6 +16,8 @@ import soot.jimple.Stmt;
 import soot.jimple.internal.JInvokeStmt;
 import soot.jimple.spark.SparkTransformer;
 import soot.jimple.spark.pag.PAG;
+import soot.Local;
+import soot.PointsToSet;
 import soot.Scene;
 import soot.SootClass;
 import soot.SootMethod;
@@ -27,6 +29,7 @@ import soot.jimple.internal.JVirtualInvokeExpr;
 import soot.jimple.IntConstant;
 import soot.jimple.InvokeExpr;
 import soot.jimple.internal.JInvokeStmt;
+import soot.jimple.internal.JReturnStmt;
 import soot.jimple.internal.JSpecialInvokeExpr;
 import soot.jimple.internal.JVirtualInvokeExpr;
 import soot.jimple.internal.JimpleLocal;
@@ -66,6 +69,16 @@ public class Verifier {
 					method.retrieveActiveBody()), sootClass);
 			analysis.run();
 			
+			for(JReturnStmt rt: analysis.returnStmts)
+			{
+				 Value v = rt.getOpBox().getValue();
+				 
+				 PointsToSet pts = pointsToAnalysis.reachingObjects((Local) v);
+				 PointsToSetInternal ptsi = (PointsToSetInternal) pts;
+				 
+				 ptsi.forall(v)
+				 int i = 0;
+			}
 			
 			int abstractNum = 0;
 			for(JInvokeStmt call : analysis.setSpeedCalls){

@@ -65,6 +65,9 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 	public ArrayList<JInvokeStmt> setSpeedCalls = new ArrayList<JInvokeStmt>();
 	public ArrayList<Abstract1> setSpeedAbstract = new ArrayList<Abstract1>();
 	
+	//list of return statements
+	public ArrayList<JReturnStmt> returnStmts = new ArrayList<JReturnStmt>();
+	
 	//list type
 	private static List<String> intTypes = Arrays.asList("int","short","byte");
 	
@@ -277,6 +280,9 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 				
 				assignmentIterFallout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_fallout));
 				assignmentIterBranchout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_branchout));	
+				
+				JReturnStmt stmt = (JReturnStmt) s;
+				returnStmts.add(stmt);
 				
 			} else if (s instanceof JInvokeStmt){
 				o_fallout = new Abstract1(man, inWrapper.get());
