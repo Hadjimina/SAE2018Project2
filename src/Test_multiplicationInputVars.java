@@ -1,7 +1,8 @@
 public class Test_multiplicationInputVars {
-	public static void m1(int a, int b) {
+	public static Car m1(int a, int b) {
 		Car car = new Car();
 		int x = a * b;
 		car.setSpeed(x);
+		return car;
 	}
 }
