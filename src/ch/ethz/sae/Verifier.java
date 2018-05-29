@@ -41,8 +41,7 @@ import soot.jimple.spark.sets.PointsToSetInternal;
 
 public class Verifier {
 	
-	private static String noSpeedSet = "NO SPEED SET";
-	private static String functionName = "setSpeed";
+	
 
 	public static void main(String[] args) {
 		if (args.length != 1) {
@@ -55,9 +54,9 @@ public class Verifier {
 		SootClass sootClass = loadClass(className);
 		PAG pointsToAnalysis = doPointsToAnalysis(sootClass);
 		int speedcounter = 0;
-		String result = noSpeedSet;
+		String result = "";
 		ArrayList<String> results = new ArrayList<String>();
-
+		
 		/* iterating over all test methods (you can assume that these is only one test method per test class) */
 		for (SootMethod method : sootClass.getMethods()) {
 
@@ -91,6 +90,7 @@ public class Verifier {
         		possibleConstructors.forall(visitor);
         	}
 			
+
 			/*
 			for(JReturnStmt rt: analysis.returnStmts)
 			{
@@ -144,46 +144,28 @@ public class Verifier {
 				results.add(result);
 			}
 			*/
+//======= Philipp Hadjimina
+//
+//            Visitor visit = new Visitor(analysis, pointsToAnalysis);
+//            
+//        	for (JInvokeStmt call : analysis.setSpeedCalls) {
+//        		JVirtualInvokeExpr vInvokeExpr = (JVirtualInvokeExpr) call.getInvokeExpr();
+//        		Value carValue = vInvokeExpr.getBase();
+//        		PointsToSetInternal possibleConstructors = (PointsToSetInternal) pointsToAnalysis.reachingObjects((Local) carValue);
+//
+//        		visit.setCall(call);
+//        		possibleConstructors.forall(visit);
+//        	}
+//            
+//        	System.out.println(visit.getMaxResult());
+//
+//>>>>>>> 88fef6d1faa12269b708398ff823e0620d151d25
 			
-			result = getMaxResult(results);
-			System.out.println(result);
 		}
 	}
 	
-	public static String getMaxResult(ArrayList<String> list){
-		String toReturn = noSpeedSet;
-		int currentMax = Integer.MIN_VALUE;
-		boolean isSet = false;
-		for(String  s: list){
-			if(isNumeric(s)){
-				isSet = true;
-				int current = Integer.parseInt(s);
-				if(currentMax < current){
-					currentMax = current;
-				}
-			}
-		}
-		if(isSet){
-			return currentMax+"";
-		}else{
-			return toReturn;
-		}
-		
-	}
 	
-	public static boolean isNumeric(String str)
-	{
-		try
-		{
-			double d = Double.parseDouble(str);
-		}
-		catch(NumberFormatException nfe)
-		{
-			return false;
-		}
-		
-		return true;
-	}
+
 	
 	/* =================================================================================== */
 

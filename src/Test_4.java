@@ -8,6 +8,10 @@ public class Test_4 {
 		a = b;
 		car.setSpeed(a-n);
 		b++;
+<<<<<<< HEAD
 	return car;	
+=======
+		return car;
+>>>>>>> 88fef6d1faa12269b708398ff823e0620d151d25
 	}
 }
