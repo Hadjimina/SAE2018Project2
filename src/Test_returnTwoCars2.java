@@ -1,4 +1,4 @@
-public class Test_returnTwoCars1 {
+public class Test_returnTwoCars2 {
 	public static Car m1(int j) {
 		Car car1 = new Car();
 		Car car2 = new Car();
@@ -6,13 +6,13 @@ public class Test_returnTwoCars1 {
 		
 		
 		if(j < 10 && j> 10){ 
-			car1.setSpeed(1);
+			car1.setSpeed(j);
 			return car1;
 		}else if(j < 10  ){ 
-			car2.setSpeed(2);
+			car2.setSpeed(j);
 			return car2;
 		}else{
-			car3.setSpeed(3);
+			car3.setSpeed(j);
 			return car3;
 		}
 		

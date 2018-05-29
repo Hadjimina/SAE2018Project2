@@ -1,13 +1,6 @@
 package ch.ethz.sae;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import soot.jimple.InvokeExpr;
 import soot.jimple.internal.JSpecialInvokeExpr;
@@ -82,7 +75,6 @@ public class Visitor extends P2SetVisitor {
 
 	private static String noSpeedSet = "NO SPEED SET";
 	private final Analysis analysis;
-	private final ArrayList<AllocNode> carSet;
 	private final ArrayList<Value> returnSet;
 	private JInvokeStmt call;
 	public String result;
@@ -90,34 +82,14 @@ public class Visitor extends P2SetVisitor {
 	
 public Visitor(Analysis analysis, PAG pointsToAnalysis) {
 	
-		//Set class variables
 		this.analysis = analysis;
-		this.carSet = new ArrayList<AllocNode>();
 		this.returnSet = new ArrayList<Value>();
 		this.resultList = new ArrayList<String>();
 		this.result= noSpeedSet;
 
-		//loop over return statements of class
 		for(JReturnStmt ret: analysis.returnStmts){
-			// Get the robot the constructor was set on
 			Value v = ret.getOpBox().getValue();
-			returnSet.add(v);
-							
-		}
-		
-		// Loop over all initCalls of the analysed class
-		for (JSpecialInvokeExpr initExp : analysis.setCarConstructors) {
-						
-			JimpleLocal car = (JimpleLocal) initExp.getBase();
-			
-			PointsToSetInternal setOfConstructors = (PointsToSetInternal) pointsToAnalysis.reachingObjects(car);
-			
-			workaround sw = new workaround();
-			setOfConstructors.forall(sw);
-
-			for (Node call : sw.list) {
-				carSet.add((AllocNode) call);
-			}	
+			returnSet.add(v);			
 		}
 		
 	}
@@ -142,8 +114,7 @@ public Visitor(Analysis analysis, PAG pointsToAnalysis) {
 		
 		
 		Interval i = null;				
-
-		//if int we do not check if it is reachable
+		
 		SootApronConverter converter = new SootApronConverter();
 		try {
 		if (arg instanceof IntConstant) {
@@ -213,7 +184,7 @@ public Visitor(Analysis analysis, PAG pointsToAnalysis) {
 	}
 	
 
-	//ONly called on setSpeed statments
+	//Only called on setSpeed statments
 	public void setCall(JInvokeStmt call) {
 		this.call = call;			
 	}

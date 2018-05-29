@@ -72,9 +72,8 @@ public class Verifier {
             Visitor visit = new Visitor(analysis, pointsToAnalysis);
             
         	for (JInvokeStmt call : analysis.setSpeedCalls) {
-        		JVirtualInvokeExpr vInvokeExpr = (JVirtualInvokeExpr) call.getInvokeExpr();
-        		Value carValue = vInvokeExpr.getBase();
-        		PointsToSetInternal possibleConstructors = (PointsToSetInternal) pointsToAnalysis.reachingObjects((Local) carValue);
+        		JVirtualInvokeExpr expr = (JVirtualInvokeExpr) call.getInvokeExpr();
+        		PointsToSetInternal possibleConstructors = (PointsToSetInternal) pointsToAnalysis.reachingObjects((Local) expr.getBase());
 
         		visit.setCall(call);
         		possibleConstructors.forall(visit);

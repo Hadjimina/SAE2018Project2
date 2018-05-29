@@ -1,8 +1,10 @@
 public class Test_6 {
-	public static Car m5(int a, int n) {
+	public static Car m5( int n) {
 		Car car = new Car();
-		if (n >= 0) {
-			car.setSpeed(-n);
+		
+		if (n > 0) {
+			int q = -n;
+			car.setSpeed(q);
 		} else {
 			car.setSpeed(n);
 		}

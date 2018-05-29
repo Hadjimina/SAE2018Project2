@@ -226,50 +226,74 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 				
 				 
 			} else if (s instanceof JIfStmt) {
+
 				IfStmt Sif= (JIfStmt) s;
 				Value c = Sif.getCondition();
-				AbstractBinopExpr cond = (AbstractBinopExpr) Sif.getCondition();
-				Value valL = cond.getOp1();
-				Value valR = cond.getOp2();
-				Texpr1Node nodeL = converter.convertValueExpression(valL);
-				Texpr1Node nodeR = converter.convertValueExpression(valR);
-
+				AbstractBinopExpr cond = (AbstractBinopExpr) Sif.getCondition(); 
+				
+				Texpr1Node nodeL = converter.convertValueExpression(cond.getOp1());
+				Texpr1Node nodeR = converter.convertValueExpression(cond.getOp2());
+				
 				Texpr1Node l_r = new Texpr1BinNode(Texpr1BinNode.OP_SUB, nodeL, nodeR);
 				Texpr1Node r_l = new Texpr1BinNode(Texpr1BinNode.OP_SUB, nodeR, nodeL);
-
+				
 				Texpr1Intern expR_L = new Texpr1Intern(env,r_l);
 				Texpr1Intern expL_R = new Texpr1Intern(env,l_r);
 				Tcons1[] tcs1 = null;
-				Tcons1[] tcs2 = null;
-
-				if (c instanceof JEqExpr) {
-				tcs1 = new Tcons1[]{ new Tcons1(Tcons1.EQ, expR_L) };
-				tcs2 = new Tcons1[]{ new Tcons1(Tcons1.DISEQ, expR_L) };
+				Tcons1[] tcs2  = null;
+				
+				if (c instanceof JEqExpr) {					
+					tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expR_L),new Tcons1(Tcons1.SUPEQ, expL_R)};
+					tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expR_L),new Tcons1(Tcons1.SUP, expL_R)};
 				} else if (c instanceof JGeExpr) {
-				tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expL_R) };
-				tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expR_L) };
+					tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expL_R)};
+					tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expR_L)};
 				} else if (c instanceof JGtExpr) {
-				tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expL_R) };
-				tcs2 = new Tcons1[] { new Tcons1(Tcons1.SUPEQ, expR_L) };
+					tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expL_R)};
+					tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expR_L)};
 				} else if (c instanceof JLeExpr) {
-				tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expR_L) };
-				tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expL_R) };
+					tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expR_L)};
+					tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expL_R)};
 				} else if (c instanceof JLtExpr) {
-				tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expR_L) };
-				tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expL_R) };
+					tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expR_L)};
+					tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expL_R)};
 				} else if (c instanceof JNeExpr) {
-				tcs1 = new Tcons1[]{ new Tcons1(Tcons1.DISEQ, expR_L) };
-				tcs2 = new Tcons1[]{ new Tcons1(Tcons1.EQ, expR_L) };
+					tcs1 = new Tcons1[]{ new Tcons1(Tcons1.SUP, expR_L),new Tcons1(Tcons1.SUP, expL_R)};
+					tcs2 = new Tcons1[]{ new Tcons1(Tcons1.SUPEQ, expR_L),new Tcons1(Tcons1.SUP, expL_R)};
 				} else {
-				invalidFlag = true;
+					invalidFlag = true;
 				}
-
+				
 				if(!invalidFlag){
-				o_fallout = new Abstract1(man, tcs1);
-				o_branchout = new Abstract1(man, tcs2);
-
-				assignmentIterFallout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_fallout));
-				assignmentIterBranchout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_branchout));
+					o_branchout = new Abstract1(man, inWrapper.get());
+					o_fallout = new Abstract1(man, inWrapper.get());
+					
+					Abstract1 F = new Abstract1(man,new Tcons1[]{tcs2[0]});
+					Abstract1 T = new Abstract1(man,new Tcons1[]{tcs1[0]});
+					
+					
+					
+					if(c instanceof JEqExpr || c instanceof JNeExpr){
+						Abstract1 FE = new Abstract1(man,new Tcons1[]{tcs2[1]});
+						Abstract1 TE = new Abstract1(man,new Tcons1[]{tcs1[1]});
+						
+						Abstract1 TC = o_branchout.meetCopy(man, T);
+						Abstract1 FC = o_fallout.meetCopy(man, F);
+						
+						o_branchout.meet(man, TE);
+						o_branchout.meet(man, TC);
+						
+						o_fallout.join(man, FE);
+						o_fallout.join(man, FC);
+					}else{		
+						
+						o_branchout.meet(man,T);
+						o_fallout.meet(man, F);
+					}
+					
+			
+					assignmentIterFallout(inWrapper, fallOutWrappers, o_fallout, o_fallout);
+					assignmentIterBranchout(inWrapper, branchOutWrappers, o_branchout, o_branchout);	
 				}
 			}else if(s instanceof JReturnStmt){
 				
@@ -278,7 +302,7 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 				o_branchout = new Abstract1(man, inWrapper.get());
 				
 				assignmentIterFallout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_fallout));
-				assignmentIterBranchout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_branchout));	
+				assignmentIterBranchout(inWrapper, branchOutWrappers, o_branchout, inWrapper.get().meetCopy(man, o_branchout));	
 				
 				JReturnStmt stmt = (JReturnStmt) s;
 				returnStmts.add(stmt);
@@ -288,7 +312,7 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 				o_branchout = new Abstract1(man, inWrapper.get());
 				
 				assignmentIterFallout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_fallout));
-				assignmentIterBranchout(inWrapper, fallOutWrappers, o_fallout, inWrapper.get().meetCopy(man, o_branchout));	
+				assignmentIterBranchout(inWrapper, branchOutWrappers, o_branchout, inWrapper.get().meetCopy(man, o_branchout));	
 				
 				JInvokeStmt stmt = (JInvokeStmt)s;
 				InvokeExpr expr = ((JInvokeStmt) s).getInvokeExpr();
@@ -355,6 +379,11 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 			
 	}
 
+	
+	public static final boolean isInt(Value val) {
+		return intTypes.contains(val.getType().toString());
+	}
+	
 	/* ======================================================== */
 
 	/* no need to use or change the variables and methods below */
@@ -474,10 +503,6 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 	}
 
 
-
-
-
-
 	@Override
 	protected void merge(Unit succNode, AWrapper in_w1, AWrapper in_w2, AWrapper out_w) {
 		Counter count = loopHeads.get(succNode);
@@ -543,10 +568,7 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 		}
 	}
 	
-	public static final boolean isInt(Value val) {
-		return intTypes.contains(val.getType().toString());
-		
-	}
+	
 
 
 	/* widening threshold and widening points */
