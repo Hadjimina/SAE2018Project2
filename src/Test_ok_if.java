@@ -1,5 +1,5 @@
 public class Test_ok_if {
-	public static void m1(int j) {
+	public static Car m1(int j) {
 		Car car = new Car();
 		int i = 0;
 		if (j > 2 && j < 6) {
@@ -8,5 +8,6 @@ public class Test_ok_if {
 			car.setSpeed(j);
 		}
 		car.setSpeed(i);
+		return car;
 	}
 }

@@ -68,7 +68,30 @@ public class Verifier {
 			Analysis analysis = new Analysis(new BriefUnitGraph(
 					method.retrieveActiveBody()), sootClass);
 			analysis.run();
+	
 			
+			PointsToVisitor visitor = new PointsToVisitor(analysis, pointsToAnalysis);
+			
+			for (JInvokeStmt call : analysis.setSpeedCalls) {
+        		
+        		// Get invoking expression
+        		JVirtualInvokeExpr vInvokeExpr = (JVirtualInvokeExpr) call.getInvokeExpr();
+        		
+        		// Extract robot
+        		Value callingCar = vInvokeExpr.getBase();
+        		System.out.println(callingCar.toString());
+        		
+        		// Find the possible constructors of that robot
+        		PointsToSetInternal possibleConstructors = (PointsToSetInternal) pointsToAnalysis.reachingObjects((Local) callingCar);
+        		
+        		// Set call
+        		visitor.setCall(call);
+        		
+        		// Iterate over all possible constructors and call the visit method of visitor
+        		possibleConstructors.forall(visitor);
+        	}
+			
+			/*
 			for(JReturnStmt rt: analysis.returnStmts)
 			{
 				 Value v = rt.getOpBox().getValue();
@@ -76,10 +99,13 @@ public class Verifier {
 				 PointsToSet pts = pointsToAnalysis.reachingObjects((Local) v);
 				 PointsToSetInternal ptsi = (PointsToSetInternal) pts;
 				 
-				 ptsi.forall(v)
+				 //ptsi.forall(v);
 				 int i = 0;
 			}
+			PointsToVisitor visitor = new PointsToVisitor(analysis, pointsToAnalysis);
 			
+			
+			/*
 			int abstractNum = 0;
 			for(JInvokeStmt call : analysis.setSpeedCalls){
 				
@@ -117,7 +143,7 @@ public class Verifier {
 				
 				results.add(result);
 			}
-	
+			*/
 			
 			result = getMaxResult(results);
 			System.out.println(result);

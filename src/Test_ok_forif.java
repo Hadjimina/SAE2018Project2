@@ -1,5 +1,5 @@
 public class Test_ok_forif {
-	public static void m1(int j) {
+	public static Car m1(int j) {
 		Car car = new Car();
 		int i = 8;
 
@@ -9,6 +9,7 @@ public class Test_ok_forif {
 				car.setSpeed(j);
 			}
 		}
+		return car;
 	}
 }
 

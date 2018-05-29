@@ -1,7 +1,5 @@
 package ch.ethz.sae;
 
-import gmp.Mpq;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,6 +66,7 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 	//list of return statements
 	public ArrayList<JReturnStmt> returnStmts = new ArrayList<JReturnStmt>();
 	
+	public ArrayList<JSpecialInvokeExpr> initCalls = new ArrayList<JSpecialInvokeExpr>();
 	//list type
 	private static List<String> intTypes = Arrays.asList("int","short","byte");
 	
@@ -301,6 +300,10 @@ public class Analysis extends ForwardBranchedFlowAnalysis<AWrapper> {
 					setSpeedCalls.add(stmt);
 					setSpeedAbstract.add(inWrapper.get());
 				}
+				else if (className.equals("Car") && functName.equals("<init>")) {
+					if (!initCalls.contains(expr)) initCalls.add((JSpecialInvokeExpr) expr);
+				}
+				
 			}
 			else {
 				invalidFlag = true;	

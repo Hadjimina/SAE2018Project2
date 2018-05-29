@@ -1,5 +1,5 @@
 public class Test_notok_notconstr {
-	public static void m1(int j) {
+	public static Car m1(int j) {
 		Car car = new Car();
 		int i = 1;
 		int f = 1;
@@ -7,5 +7,6 @@ public class Test_notok_notconstr {
 		int v = j * f;
 		car.setSpeed(q);
 		car.setSpeed(v);
+		return car;
 	}
 }

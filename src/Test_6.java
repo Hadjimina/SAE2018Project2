@@ -1,5 +1,5 @@
 public class Test_6 {
-	public static void m5(int a, int n) {
+	public static Car m5(int a, int n) {
 		Car car = new Car();
 		if (n >= 0) {
 			a = -n;
@@ -7,5 +7,6 @@ public class Test_6 {
 			a = n;
 		}
 		car.setSpeed(a);
+		return car;
 	}
 }

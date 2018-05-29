@@ -1,5 +1,5 @@
 public class Test_ok_dowhile {
-	public static void m1(int j) {
+	public static Car m1(int j) {
 		Car car = new Car();
 		int i = 8;
 
@@ -8,5 +8,7 @@ public class Test_ok_dowhile {
 			i *= -1;
 			
 		}while(i==8);
+		return car;
 	}
+	
 }
