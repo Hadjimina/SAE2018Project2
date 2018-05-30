@@ -167,6 +167,8 @@ public Visitor(Analysis analysis, PAG pointsToAnalysis) {
 			tempResult = noSpeedSet;
 		}else if (i.sup().isInfty() == 1){
 			tempResult = ""+Integer.MAX_VALUE;
+		}else if(i.sup().isInfty()==-1){
+			tempResult = ""+Integer.MIN_VALUE;
 		}
 		else{
 			tempResult = i.sup().toString();
